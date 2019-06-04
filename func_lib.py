@@ -33,15 +33,19 @@ def instruct_allmenu():
     print("-----------------------------")
 
 def instruct_casher():
-    menu = input("\t메뉴 : ")
-    cur.execute("select price from menu where mID = " + menu + ";")
-    items = cur.fetchall()
-    num = int(input("\t개수 : " ))
-    pay = items[0][0] * num
-    payment = input("\t결제수단(money, card) : ")
+    stop = 'y'
+    pay = 0
+    while stop != 'n':
+        menu = input("\t메뉴 : ")
+        cur.execute("select price from menu where mID = " + menu + ";")
+        items = cur.fetchall()
+        num = int(input("\t개수 : " ))
+        pay = pay + (items[0][0] * num)
+        payment = input("\t결제수단(money, card) : ")
+        cur. execute("insert into sales value (" + str(menu) + ", " + str(num) + ", \'" +str(payment) + "\', " + str(now) + ")")
+        stop = input("계속하시겠습니까?(y or n) : ")
     print("\t결제금액 :", pay)
     print("\t계산 완료되었습니다.")
-    cur. execute("insert into sales value (" + str(menu) + ", " + str(num) + ", \'" +str(payment) + "\', " + str(now) + ")")
 
 def instruct_sales():
     cur.execute("select mName, num, payment, saleDate from sales, menu where sales.mID = menu.mID")
