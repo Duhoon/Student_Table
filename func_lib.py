@@ -1,9 +1,11 @@
 import pymysql
 import time
+import random
 
 db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
 cur = db.cursor()
-now = time.strftime('%Y%m%d%H%M%S', time.localtime())
+now2 = time.strftime('%Y%m%d%H%M%S', time.localtime())
+now = time.strftime('%Y%m%d', time.localtime())
 
 def initial_screen():
     print("\t\tST-POS시스템을 사용해주셔서 감사합니다.")
@@ -32,23 +34,41 @@ def instruct_allmenu():
         print("\t", row[0], "\t", row[1], "\t", row[2])
     print("-----------------------------")
 
+
 def instruct_casher():
     stop = 'y'
     pay = 0
     while stop != 'n':
+
+        tablenum = input("\t테이블을 선택하세요(1~5번)")
+
         menu = input("\t메뉴 : ")
-        cur.execute("select price from menu where mID = " + menu + ";")
+        cur.execute("select price from menu where mnID = " + "\""+menu + "\"" + ";")
+
         items = cur.fetchall()
-        num = int(input("\t개수 : " ))
-        pay = pay + (items[0][0] * num)
+        Mnum = int(input("\t개수 : " ))
+        pay = pay + (items[0][0] * Mnum)
         payment = input("\t결제수단(money, card) : ")
-        cur. execute("insert into sales value (" + str(menu) + ", " + str(num) + ", \'" +str(payment) + "\', " + str(now) + ")")
+
         stop = input("계속하시겠습니까?(y or n) : ")
+
+        cur.execute("select sId from sales;") #sid 조회
+        num = random.randrange(0, 100)
+        sID = cur.fetchall()
+        print(sID);
+        while num in sID:  # 중복될 경우
+                num = random.randrange(0, 100)  # 다시 난수 생성
+            #여기다가 주문추가
+        sID = num
+
+        cur.execute("insert into sales values (" + str(num) + ", " + str(
+        tablenum) + ", \'" + str(menu)+ "\', " + str(pay) + ", " + str(Mnum) + ", " + str(now)+")")
+
     print("\t결제금액 :", pay)
     print("\t계산 완료되었습니다.")
 
 def instruct_sales():
-    cur.execute("select mName, num, payment, saleDate from sales, menu where sales.mID = menu.mID")
+    cur.execute("select sID, tableNum, mnName, sDate from sales, menu where sales.mnID = menu.mnID")
     print("------------------------------------------------------")
     print("\t메뉴이름\t개수\t\t지불수단\t\t날짜시간")
     for row in cur.fetchall():
