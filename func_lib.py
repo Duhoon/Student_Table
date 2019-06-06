@@ -1,9 +1,10 @@
 import pymysql
 import time
 import random
+from prettytable import PrettyTable
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
 #pay =0
@@ -40,111 +41,139 @@ def instruct_allmenu():
     print("-----------------------------")
 
 def instruct_order():
-    stop = 'y'
-    pay=0
-    cur.execute("select sId from sales;")  # sid 조회
-    num = random.randrange(0, 100)
-    sID = cur.fetchall()
-    print(sID);
-    while num in sID:  # 중복될 경우
-        num = random.randrange(0, 100)  # 다시 난수 생성
-    # 여기다가 주문추가
-    sID = num
-    tablenum = input("\t테이블을 선택하세요(1~5번)")
+   stop = 'y'
+   pay=0
+   cur.execute("select sId from sales;")  # sid 조회
+   num = random.randrange(0, 100)
+   sID = cur.fetchall()
+   print(sID);
+   while num in sID:  # 중복될 경우
+       num = random.randrange(0, 100)  # 다시 난수 생성
+   # 여기다가 주문추가
+   sID = num
+   tablenum = int(input("\t테이블을 선택하세요(1~5번)"))
 
-    while stop != 'n':
+   while stop != 'n':
 
 
-        menu = input("\t메뉴 : ")
-        cur.execute("select price from menu where mnName = " + "\""+menu + "\"" + ";")
-        items = cur.fetchall()
-        cur.execute("select mnID from menu where mnName = " + "\"" + menu + "\"" + ";")
-        menu_ID = cur.fetchall()
-        Mnum = int(input("\t개수 : " ))
+       menu = input("\t메뉴 : ")
+       cur.execute("select price from menu where mnName = " + "\""+menu + "\"" + ";")
+       items = cur.fetchall()
+       cur.execute("select mnID from menu where mnName = " + "\"" + menu + "\"" + ";")
+       menu_ID = cur.fetchall()
+       Mnum = int(input("\t개수 : " ))
 
-        pay = pay + (items[0][0] * Mnum)
-        cur.execute("insert into sales values (" + str(num) + ", " + str(
-            tablenum) + ", \'" + str(menu_ID[0][0]) + "\', " + str(Mnum) + ", " + str(now) + ", \'" + str('n') + "\')")
-        stop = input("메뉴를 추가 하시겠습니까?(y or n) : ")
+
+       pay = pay + (items[0][0] * Mnum)
+       cur.execute("insert into sales values (" + str(num) + ", " + str(
+           tablenum) + ", \'" + str(menu_ID[0][0]) + "\', " + str(Mnum) + ", " + str(now) + ", \'" + str('n') + "\')")
+       stop = input("메뉴를 추가 하시겠습니까?(y or n) : ")
+
 
 def instruct_table():
     stop = 'n'
     print("-----------------------------")
-    print("\t\t\t\t1번테이블 \n")
+    print("\t\t1번테이블 ")
     pay1=0
     if cur.execute("select mnName,sNum  from sales,menu where tableNum=1 and complete = 'n' and menu.mnId=sales.mnId;"):
-        print("\t메뉴이름\t\t수량")
-
+        table = PrettyTable()
+        table.field_names= ["메뉴", " 수량 "]
         for row in cur.fetchall():
-            print("\t", row[0], "\t", row[1])
+            table.add_row([row[0],row[1]])
             cur.execute("select price from menu where mnName= \'" + str(row[0]) + "\';")
             item = cur.fetchall()
-            pay1=pay1+(item[0][0]*row[1])
+            pay1 = pay1 + (item[0][0] * row[1])
+
+        print(table)
         print("총액:",pay1)
+
     else:
         print("빈테이블")
     print("-----------------------------")
 
-    print("\t\t\t\t2번테이블 \n")
+    print("\t\t2번테이블")
     pay2=0
     if cur.execute("select mnName,sNum  from sales,menu where tableNum=2 and complete = 'n' and menu.mnId=sales.mnId;"):
-        print("\t메뉴이름\t\t수량")
-
+        table = PrettyTable()
+        table.field_names = ["메뉴", " 수량 "]
         for row in cur.fetchall():
-            print("\t", row[0], "\t", row[1])
+            table.add_row([row[0], row[1]])
             cur.execute("select price from menu where mnName= \'" + str(row[0]) + "\';")
             item = cur.fetchall()
-            pay2=pay2+(item[0][0]*row[1])
-        print("총액:",pay2)
+            pay2 = pay2 + (item[0][0] * row[1])
+
+        print(table)
+        print("총액:", pay2)
     else:
         print("빈테이블")
     print("-----------------------------")
-    print("\t\t\t\t3번테이블 \n")
+    print("\t\t3번테이블")
     pay3=0
     if cur.execute("select mnName,sNum  from sales,menu where tableNum=3 and complete = 'n' and menu.mnId=sales.mnId;"):
-        print("\t메뉴이름\t\t수량")
-
+        table = PrettyTable()
+        table.field_names = ["메뉴", " 수량 "]
         for row in cur.fetchall():
-            print("\t", row[0], "\t", row[1])
+            table.add_row([row[0], row[1]])
             cur.execute("select price from menu where mnName= \'" + str(row[0]) + "\';")
             item = cur.fetchall()
-            pay3=pay3+(item[0][0]*row[1])
-        print("총액:",pay3)
+            pay3 = pay3 + (item[0][0] * row[1])
+
+        print(table)
+        print("총액:", pay3)
     else:
         print("빈테이블")
     print("-----------------------------")
-    print("\t\t\t\t4번테이블 \n")
+    print("\t\t4번테이블")
     pay4 = 0
     if cur.execute("select mnName,sNum  from sales,menu where tableNum=4 and complete = 'n' and menu.mnId=sales.mnId;"):
-        print("\t메뉴이름\t\t수량")
-
+        table = PrettyTable()
+        table.field_names = ["메뉴", " 수량 "]
         for row in cur.fetchall():
-            print("\t", row[0], "\t", row[1])
+            table.add_row([row[0], row[1]])
             cur.execute("select price from menu where mnName= \'" + str(row[0]) + "\';")
             item = cur.fetchall()
             pay4 = pay4 + (item[0][0] * row[1])
+
+        print(table)
         print("총액:", pay4)
     else:
         print("빈테이블")
     print("-----------------------------")
-    print("\t\t\t\t5번테이블 \n")
+    print("\t\t5번테이블")
     pay5 = 0
     if cur.execute("select mnName,sNum  from sales,menu where tableNum=5 and complete = 'n' and menu.mnId=sales.mnId;"):
-        print("\t메뉴이름\t\t수량")
-
+        table = PrettyTable()
+        table.field_names = ["메뉴", " 수량 "]
         for row in cur.fetchall():
-            print("\t", row[0], "\t", row[1])
+            table.add_row([row[0], row[1]])
             cur.execute("select price from menu where mnName= \'" + str(row[0]) + "\';")
             item = cur.fetchall()
             pay5 = pay5 + (item[0][0] * row[1])
+
+        print(table)
         print("총액:", pay5)
     else:
         print("빈테이블")
 
     stop = input("계산하시겠습니까?y/n(메뉴 돌아가기는 h)")
+
     if stop == 'y':
-        print("계산완료")
-        cur.execute("UPDATE sales SET complete='y' WHERE complete='n'")
+        tablenum = int(input("몇번 테이블을 계산하시겠습니까?(1~5번)"))
+        if cur.execute("UPDATE sales SET complete='y' WHERE complete='n' and tableNum = " + str(tablenum )+ ";") :
+            if tablenum == 1:
+                print("총액:", pay1)
+            elif tablenum ==2 :
+                print("총액:",pay2)
+            elif tablenum == 3:
+                print("총액:", pay3)
+            elif tablenum == 4:
+                print("총액:",pay4)
+            elif tablenum == 5:
+                print("총액:", pay5)
+            print("계산완료")
+
+        else:
+            print("빈테이블 입니다!")
     if stop =='n':
         instruct_table()
     if stop =='h':
@@ -186,6 +215,19 @@ def instruct_sales():
 
     elif clfy == "wheather":
         print("서비스 준비 중입니다.")
+
+#def instruct_storage():
+
+    select= int(input("select number\n"
+          "1.재고 조회"
+          "2.재료 발주")}
+    if select ==1 :
+        cur.execute("select * from  ")
+
+    cur.execute("select * from ")
+
+    print("")
+
 
 if __name__ == "__main__":
     print("이게 메인일 때 출력")
