@@ -16,16 +16,22 @@ while loop == 1:
         func_lib.instruct_help()
         continue
     elif instruction == "menu":
-        func_lib.instruct_allmenu()
+        func_lib.instruct_menu()
         continue
-    elif instruction == "order":
+    elif instruction == "menuAdd":
+        func_lib.intstruct_menuAdd()
+        continue
+    elif instruction == "order": #주문하기
         func_lib.instruct_order()
         continue
-    elif instruction == "sales":
+    elif instruction == "sales":  #매출조회
         func_lib.instruct_sales()
         continue
     elif instruction == "table":
-        func_lib.instruct_table()
+        func_lib.instruct_table()  #계산 및 테이블현환
+        continue
+    elif instruction == "storage":
+        func_lib.instruct_storage()
         continue
     elif instruction == "exit":
         break
