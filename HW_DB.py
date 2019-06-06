@@ -18,8 +18,8 @@ while loop == 1:
     elif instruction == "menu":
         func_lib.instruct_allmenu()
         continue
-    elif instruction == "casher":
-        func_lib.instruct_casher()
+    elif instruction == "order":
+        func_lib.instruct_order()
         continue
     elif instruction == "sales":
         func_lib.instruct_sales()

@@ -173,7 +173,8 @@ def instruct_sales():
         print("------------------------------------------------------")
 
     elif clfy == "monthly":
-        print("서비스 준비 중입니다.")
+        cur.execute("select sYear, sMonth, sNum, sumprice from monSales")
+
 
     elif clfy == "menu":
         cur.execute("select mnName, sNum, sumprice from mnSales")
