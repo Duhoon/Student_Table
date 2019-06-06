@@ -39,7 +39,7 @@ def instruct_allmenu():
         print("\t", row[0], "\t", row[1], "\t", row[2])
     print("-----------------------------")
 
-def instruct_casher():
+def instruct_order():
     stop = 'y'
     pay=0
     cur.execute("select sId from sales;")  # sid 조회
@@ -56,17 +56,17 @@ def instruct_casher():
 
 
         menu = input("\t메뉴 : ")
-        cur.execute("select price from menu where mnID = " + "\""+menu + "\"" + ";")
-
+        cur.execute("select price from menu where mnName = " + "\""+menu + "\"" + ";")
         items = cur.fetchall()
+        cur.execute("select mnID from menu where mnName = " + "\"" + menu + "\"" + ";")
+        menu_ID = cur.fetchall()
         Mnum = int(input("\t개수 : " ))
 
         pay = pay + (items[0][0] * Mnum)
         cur.execute("insert into sales values (" + str(num) + ", " + str(
-            tablenum) + ", \'" + str(menu) + "\', " + str(Mnum) + ", " + str(now) + ", \'" + str('n') + "\')")
+            tablenum) + ", \'" + str(menu_ID[0][0]) + "\', " + str(Mnum) + ", " + str(now) + ", \'" + str('n') + "\')")
         stop = input("메뉴를 추가 하시겠습니까?(y or n) : ")
-    print("\t결제금액 :", pay)
-    print("\t계산 완료되었습니다.")
+
 def instruct_table():
     stop = 'n'
     print("-----------------------------")
@@ -152,12 +152,39 @@ def instruct_table():
 
 
 def instruct_sales():
-    cur.execute("select sID, tableNum, mnName, sDate,complete from sales, menu where sales.mnID = menu.mnID")
-    print("------------------------------------------------------")
-    print("\t메뉴이름\t개수\t\t지불수단\t\t날짜시간")
-    for row in cur.fetchall():
-        print("\t", row[0], "\t\t", row[1], "\t\t", row[2], "\t", row[3], "\t",row[4])
-    print("------------------------------------------------------")
+    print("일별 매출 : daily | 월별 매출 : monthly | 메뉴별 매출 : menu")
+    print("날씨별 매출 : weather | 주문당 매출 : sales\n")
+    clfy = input("확인하고 싶은 매출 카테고리 입력 : ")
+
+    if clfy == "sales":
+        cur.execute("select sDate, sID, mnName, sNum, price * sNum from sales, menu where sales.mnID = menu.mnID")
+        print("------------------------------------------------------")
+        print("\t날짜시간\t\t\t\t주문ID\t\t메뉴이름\t\t\t개수\t\t매출총합")
+        for row in cur.fetchall():
+            print("\t", row[0], "\t\t", row[1], "\t\t", row[2], "\t\t", row[3], "\t", row[4])
+        print("------------------------------------------------------")
+
+    elif clfy == "daily":
+        cur.execute("select sDate, sNum, sumprice from dailySales")
+        print("------------------------------------------------------")
+        print("\t날짜시간\t\t\t\t개수\t\t매출총합")
+        for row in cur.fetchall():
+            print("\t", row[0], "\t\t", row[1], "\t\t", row[2])
+        print("------------------------------------------------------")
+
+    elif clfy == "monthly":
+        print("서비스 준비 중입니다.")
+
+    elif clfy == "menu":
+        cur.execute("select mnName, sNum, sumprice from mnSales")
+        print("------------------------------------------------------")
+        print("\t메뉴이름\t팔린개수\t\t매출총합")
+        for row in cur.fetchall():
+            print("{:<10}".format(str(row[0])), "{:>10}".format(str(row[1])) )
+        print("------------------------------------------------------")
+
+    elif clfy == "wheather":
+        print("서비스 준비 중입니다.")
 
 if __name__ == "__main__":
     print("이게 메인일 때 출력")
