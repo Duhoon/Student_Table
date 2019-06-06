@@ -2,8 +2,8 @@ import func_lib
 import pymysql
 import time
 
-#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-db = pymysql.connect(host ="localhost",user ="root",password="123123",database='nj',charset='utf8')
+db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+#db = pymysql.connect(host ="localhost",user ="root",password="123123",database='nj',charset='utf8')
 
 loop = 1
 cur = db.cursor()

@@ -3,8 +3,8 @@ import time
 import random
 from prettytable import PrettyTable
 
-#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
 #pay =0
@@ -46,7 +46,6 @@ def instruct_order():
    cur.execute("select sId from sales;")  # sid 조회
    num = random.randrange(0, 100)
    sID = cur.fetchall()
-   print(sID);
    while num in sID:  # 중복될 경우
        num = random.randrange(0, 100)  # 다시 난수 생성
    # 여기다가 주문추가
@@ -182,52 +181,57 @@ def instruct_table():
 
 def instruct_sales():
     print("일별 매출 : daily | 월별 매출 : monthly | 메뉴별 매출 : menu")
-    print("날씨별 매출 : weather | 주문당 매출 : sales\n")
+    print("날씨별 매출 : weather | 주문당 매출 : sales | 미세먼지 상황별 매출 : dust\n")
     clfy = input("확인하고 싶은 매출 카테고리 입력 : ")
 
     if clfy == "sales":
         cur.execute("select sDate, sID, mnName, sNum, price * sNum from sales, menu where sales.mnID = menu.mnID")
-        print("------------------------------------------------------")
-        print("\t날짜시간\t\t\t\t주문ID\t\t메뉴이름\t\t\t개수\t\t매출총합")
+        table = PrettyTable()
+        table.field_names = ["날짜", "주문ID", "메뉴이름", "개수", "매출총합"]
         for row in cur.fetchall():
-            print("\t", row[0], "\t\t", row[1], "\t\t", row[2], "\t\t", row[3], "\t", row[4])
-        print("------------------------------------------------------")
+            table.add_row([row[0], row[1], row[2], row[3], row[4]])
+        print(table)
 
     elif clfy == "daily":
         cur.execute("select sDate, sNum, sumprice from dailySales")
-        print("------------------------------------------------------")
-        print("\t날짜시간\t\t\t\t개수\t\t매출총합")
+        table = PrettyTable()
+        table.field_names = ["날짜", "개수", "매출총합"]
         for row in cur.fetchall():
-            print("\t", row[0], "\t\t", row[1], "\t\t", row[2])
-        print("------------------------------------------------------")
+            table.add_row([row[0], row[1], row[2]])
+        print(table)
 
     elif clfy == "monthly":
         cur.execute("select sYear, sMonth, sNum, sumprice from monSales")
+        table = PrettyTable()
+        table.field_names = ["연도", "월", "판매량", "매출총합"]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1], row[2], row[3]])
+        print(table)
 
 
     elif clfy == "menu":
         cur.execute("select mnName, sNum, sumprice from mnSales")
-        print("------------------------------------------------------")
-        print("\t메뉴이름\t팔린개수\t\t매출총합")
+        table = PrettyTable()
+        table.field_names = ["메뉴이름" , "판매량", "매출총합"]
         for row in cur.fetchall():
-            print("{:<10}".format(str(row[0])), "{:>10}".format(str(row[1])) )
-        print("------------------------------------------------------")
+            table.add_row([row[0], row[1], row[2]])
+        print(table)
 
-    elif clfy == "wheather":
-        print("서비스 준비 중입니다.")
+    elif clfy == "weather":
+        cur.execute("select state, mnName, sNum, sumprice from wtSales")
+        table = PrettyTable()
+        table.field_names = ["날씨", "메뉴이름", "판매량", "매출총합"]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1], row[2], row[3]])
+        print(table)
 
-#def instruct_storage():
-
-    select= int(input("select number\n"
-          "1.재고 조회"
-          "2.재료 발주")}
-    if select ==1 :
-        cur.execute("select * from  ")
-
-    cur.execute("select * from ")
-
-    print("")
-
+    elif clfy == "dust":
+        cur.execute("select dust, mnName, sNum, sumprice from dtSales")
+        table = PrettyTable()
+        table.field_names = ["미세먼지 농도", "메뉴이름", "판매량", "매출총합"]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1], row[2], row[3]])
+        print(table)
 
 if __name__ == "__main__":
     print("이게 메인일 때 출력")
