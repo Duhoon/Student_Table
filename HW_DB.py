@@ -2,8 +2,8 @@ import func_lib
 import pymysql
 import time
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-#db = pymysql.connect(host ="localhost",user ="root",password="123123",database='nj',charset='utf8')
+#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+db = pymysql.connect(host ="localhost",user ="root",password="123123",database='nj',charset='utf8')
 
 loop = 1
 cur = db.cursor()
@@ -12,10 +12,8 @@ func_lib.initial_screen()
 
 while loop == 1:
     instruction = func_lib.instruct_input()
-    if instruction == "help":
-        func_lib.instruct_help()
-        continue
-    elif instruction == "menu":
+
+    if instruction == "menu":
         func_lib.instruct_menu()
         continue
     elif instruction == "menuAdd":
@@ -33,7 +31,12 @@ while loop == 1:
     elif instruction == "storage":
         func_lib.instruct_storage()
         continue
+    elif instruction == "insert":
+        func_lib.insert_excel_to_db()
+        continue
     elif instruction == "exit":
+        func_lib.instruct_exit()
+        db.commit()
         break
 
 db.close()

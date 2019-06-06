@@ -2,37 +2,31 @@ import pymysql
 import time
 import random
 from prettytable import PrettyTable
+from openpyxl import Workbook
+from openpyxl import load_workbook
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
-#pay =0
-#tablenum = 0
-#num = 0
-#menu = ''
+
 #Mnum = 0
 
 
 def initial_screen():
     print("\t\tST-POS시스템을 사용해주셔서 감사합니다.")
-    print("--------------------------------------------------------")
-    print("\t\t 메뉴 \t\t 계산 \t\t 매출 \t\t 재고")
-    print("--------------------------------------------------------")
-    print("프롬프트에 'help'를 치시면 사용 가능한 명령어를 확인하실 수 있습니다.")
-def instruct_input():
-    instruction = input(">> ")
-    return instruction
-
-
-def instruct_help():
+    print("-----------------------------")
     print("\n프롬프트에 다음 설명하는 것을 입력하세요.")
     print("menu       현재 매장에서 판매하는 메뉴 확인")
+    print("menuAdd    메뉴 추가 기능")
     print("order      주문 입력 활성화")
     print("table      테이블 현황 파악 및 계산 기능")
     print("sales      데이터베이스에 있는 매출 카테고리별 출력")
     print("storage    재고관리 기능 실행")
     print("exit       프로그램 종료")
+def instruct_input():
+    instruction = input(">> ")
+    return instruction
 
 def instruct_menu():
     cur.execute("select * from menu")
@@ -43,6 +37,13 @@ def instruct_menu():
         table.add_row([row[1], row[2]])
     print(table)
     print("-----------------------------")
+
+    stop = input("홈으로 가려면 아무버튼을 눌러주세요")
+    if stop =='':
+        initial_screen()
+    else:
+        initial_screen()
+
 def intstruct_menuAdd():
     print("메뉴 추가하기")
     menuid = input("메뉴 id 를 입력하세요 (영어로 두글자 써주세요!)")
@@ -57,9 +58,15 @@ def intstruct_menuAdd():
     mt=input("들어가는 메뉴를 골라주세요")
     cur.execute("select mtID from materials where mtName = '"+str(mt)+"';")
     mtID = cur.fetchall()
-    print(mtID)
     cur.execute("insert into menu values (\'" + str(menuid) + "\', \'" + str(menuname) + "\'," + str(menuprice) +",\'"+str(mtID[0][0])+"\')")
+
     print("메뉴 추가완료")
+
+    stop = input("홈으로 가려면 아무버튼을 눌러주세요")
+    if stop == '':
+        initial_screen()
+    else:
+        initial_screen()
 
 def instruct_order():
    stop = 'y'
@@ -88,6 +95,12 @@ def instruct_order():
        cur.execute("insert into sales values (" + str(num) + ", " + str(
            tablenum) + ", \'" + str(menu_ID[0][0]) + "\', " + str(Mnum) + ", " + str(now) + ", \'" + str('n') + "\')")
        stop = input("메뉴를 추가 하시겠습니까?(y or n) : ")
+
+   stop2=input("테이블현황을 보려면 t 를 눌러주세요,홈으로 돌아가려면 h를 눌러주세요")
+   if stop2=="t" :
+       instruct_table()
+   elif stop2 =='h':
+       initial_screen()
 
 
 def instruct_table():
@@ -191,6 +204,11 @@ def instruct_table():
             elif tablenum == 5:
                 print("총액:", pay5)
             print("계산완료")
+            stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+            if stop == 'y':
+                instruct_table()
+            elif stop == 'h':
+                initial_screen()
 
         else:
             print("빈테이블 입니다!")
@@ -212,6 +230,11 @@ def instruct_sales():
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2], row[3], row[4]])
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop =='h':
+            initial_screen()
 
     elif clfy == "daily":
         cur.execute("select sDate, sNum, sumprice from dailySales")
@@ -220,6 +243,11 @@ def instruct_sales():
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2]])
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop == 'h':
+            initial_screen()
 
     elif clfy == "monthly":
         cur.execute("select sYear, sMonth, sNum, sumprice from monSales")
@@ -228,6 +256,11 @@ def instruct_sales():
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2], row[3]])
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop == 'h':
+            initial_screen()
 
 
     elif clfy == "menu":
@@ -235,14 +268,13 @@ def instruct_sales():
         table = PrettyTable()
         table.field_names = ["메뉴이름" , "판매량", "매출총합"]
         for row in cur.fetchall():
-            print("{:<10}".format(str(row[0])), "{:>10}".format(str(row[1])) )
-        print("------------------------------------------------------")
-
-    elif clfy == "wheather":
-        print("서비스 준비 중입니다.")
-
-
-
+            table.add_row([row[0],row[1],row[2]])
+        print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop == 'h':
+            initial_screen()
     elif clfy == "weather":
         cur.execute("select state, mnName, sNum, sumprice from wtSales")
         table = PrettyTable()
@@ -250,6 +282,11 @@ def instruct_sales():
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2], row[3]])
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop == 'h':
+            initial_screen()
 
 
 
@@ -260,7 +297,11 @@ def instruct_sales():
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2], row[3]])
         print(table)
-
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_sales()
+        elif stop == 'h':
+            initial_screen()
 def instruct_storage():
 
     select= int(input("사용할 기능을 숫자로 입력해주세요\n1.재고 조회\n2.재료 발주\n"))
@@ -271,6 +312,11 @@ def instruct_storage():
         for row in cur.fetchall():
             table.add_row([row[0], row[1]])
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_storage()
+        elif stop == 'h':
+            initial_screen()
     if select ==2:
         mtName = input("추가할 재료를 입력하세요")
         print("\n")
@@ -290,6 +336,16 @@ def instruct_storage():
             table.add_row([row[0], row[1]])
         print("추가후 재고수량")
         print(table)
+        stop = input("계속하시려면 y 버튼을 눌러주세요. 홈으로가려면 h를 눌러주세요")
+        if stop == 'y':
+            instruct_storage()
+        elif stop == 'h':
+            initial_screen()
+def instruct_exit():
+    db.commit()
+    print("종료")
+
+
 
 if __name__ == "__main__":
     print("이게 메인일 때 출력")
