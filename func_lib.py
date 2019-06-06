@@ -3,8 +3,8 @@ import time
 import random
 from prettytable import PrettyTable
 
-db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
 #pay =0
@@ -32,13 +32,32 @@ def instruct_help():
     print("sales      데이터베이스에 있는 매출을 출력")
     print("exit       프로그램 종료")
 
-def instruct_allmenu():
+def instruct_menu():
     cur.execute("select * from menu")
     print("-----------------------------")
-    print("\tmID\t메뉴이름\t\t가격")
+    table = PrettyTable()
+    table.field_names = ["메뉴", " 가격 "]
     for row in cur.fetchall():
-        print("\t", row[0], "\t", row[1], "\t", row[2])
+        table.add_row([row[1], row[2]])
+    print(table)
     print("-----------------------------")
+def intstruct_menuAdd():
+    print("메뉴 추가하기")
+    menuid = input("메뉴 id 를 입력하세요 (영어로 두글자 써주세요!)")
+    menuname=input("메뉴 이름을 입력하세요")
+    menuprice=int(input("가격을 입력하세요"))
+    cur.execute("select mtName,mtQuantity from materials")
+    table = PrettyTable()
+    table.field_names = ["재료이름", " 수량 "]
+    for row in cur.fetchall():
+        table.add_row([row[0], row[1]])
+    print(table)
+    mt=input("들어가는 메뉴를 골라주세요")
+    cur.execute("select mtID from materials where mtName = '"+str(mt)+"';")
+    mtID = cur.fetchall()
+    print(mtID)
+    cur.execute("insert into menu values (\'" + str(menuid) + "\', \'" + str(menuname) + "\'," + str(menuprice) +",\'"+str(mtID[0][0])+"\')")
+    print("메뉴 추가완료")
 
 def instruct_order():
    stop = 'y'
@@ -46,6 +65,7 @@ def instruct_order():
    cur.execute("select sId from sales;")  # sid 조회
    num = random.randrange(0, 100)
    sID = cur.fetchall()
+   print(sID);
    while num in sID:  # 중복될 경우
        num = random.randrange(0, 100)  # 다시 난수 생성
    # 여기다가 주문추가
@@ -214,8 +234,13 @@ def instruct_sales():
         table = PrettyTable()
         table.field_names = ["메뉴이름" , "판매량", "매출총합"]
         for row in cur.fetchall():
-            table.add_row([row[0], row[1], row[2]])
-        print(table)
+            print("{:<10}".format(str(row[0])), "{:>10}".format(str(row[1])) )
+        print("------------------------------------------------------")
+
+    elif clfy == "wheather":
+        print("서비스 준비 중입니다.")
+
+
 
     elif clfy == "weather":
         cur.execute("select state, mnName, sNum, sumprice from wtSales")
@@ -225,12 +250,46 @@ def instruct_sales():
             table.add_row([row[0], row[1], row[2], row[3]])
         print(table)
 
+
+
     elif clfy == "dust":
         cur.execute("select dust, mnName, sNum, sumprice from dtSales")
         table = PrettyTable()
         table.field_names = ["미세먼지 농도", "메뉴이름", "판매량", "매출총합"]
         for row in cur.fetchall():
             table.add_row([row[0], row[1], row[2], row[3]])
+        print(table)
+
+def instruct_storage():
+
+    select= int(input("select number\n"
+          "1.재고 조회\n"
+          "2.재료 발주\n"))
+    if select ==1 :
+        cur.execute("select mtName,mtQuantity from materials")
+        table = PrettyTable()
+        table.field_names = ["재료이름", " 수량 "]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1]])
+        print(table)
+    if select ==2:
+        mtName = input("추가할 재료를 입력하세요")
+        print("\n")
+        cur.execute("select mtName,mtQuantity from materials where mtName= "+"'"+str(mtName)+"' ;")
+
+        table = PrettyTable()
+        table.field_names = ["재료이름", " 수량 "]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1]])
+        print(table)
+        mtNUM=input("추가할 수량을 써주세요")
+        cur.execute("UPDATE materials SET mtQuantity = mtQuantity+"+str(mtNUM)+" WHERE mtName='"+str(mtName)+"' ;")
+        cur.execute("select mtName,mtQuantity from materials")
+        table = PrettyTable()
+        table.field_names = ["재료이름", " 수량 "]
+        for row in cur.fetchall():
+            table.add_row([row[0], row[1]])
+        print("추가후 재고수량")
         print(table)
 
 if __name__ == "__main__":
