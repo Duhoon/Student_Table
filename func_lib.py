@@ -3,8 +3,8 @@ import time
 import random
 from prettytable import PrettyTable
 
-#db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
-db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
 #pay =0
@@ -28,8 +28,10 @@ def instruct_input():
 def instruct_help():
     print("\n프롬프트에 다음 설명하는 것을 입력하세요.")
     print("menu       현재 매장에서 판매하는 메뉴 확인")
-    print("casher     계산 시스템 활성화")
-    print("sales      데이터베이스에 있는 매출을 출력")
+    print("order      주문 입력 활성화")
+    print("table      테이블 현황 파악 및 계산 기능")
+    print("sales      데이터베이스에 있는 매출 카테고리별 출력")
+    print("storage    재고관리 기능 실행")
     print("exit       프로그램 종료")
 
 def instruct_menu():
@@ -65,7 +67,6 @@ def instruct_order():
    cur.execute("select sId from sales;")  # sid 조회
    num = random.randrange(0, 100)
    sID = cur.fetchall()
-   print(sID);
    while num in sID:  # 중복될 경우
        num = random.randrange(0, 100)  # 다시 난수 생성
    # 여기다가 주문추가
@@ -177,7 +178,7 @@ def instruct_table():
     stop = input("계산하시겠습니까?y/n(메뉴 돌아가기는 h)")
 
     if stop == 'y':
-        tablenum = int(input("몇번 테이블을 계산하시겠습니까?(1~5번)"))
+        tablenum = int(input("\n\n몇번 테이블을 계산하시겠습니까?(1~5번)"))
         if cur.execute("UPDATE sales SET complete='y' WHERE complete='n' and tableNum = " + str(tablenum )+ ";") :
             if tablenum == 1:
                 print("총액:", pay1)
@@ -262,9 +263,7 @@ def instruct_sales():
 
 def instruct_storage():
 
-    select= int(input("select number\n"
-          "1.재고 조회\n"
-          "2.재료 발주\n"))
+    select= int(input("사용할 기능을 숫자로 입력해주세요\n1.재고 조회\n2.재료 발주\n"))
     if select ==1 :
         cur.execute("select mtName,mtQuantity from materials")
         table = PrettyTable()
