@@ -2,7 +2,8 @@ import pymysql
 import time
 import random
 
-db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
+db = pymysql.connect(host='localhost', port=3306, user='root', passwd='engns0403@', db='test_project')
+#db = pymysql.connect(host='localhost',  user='root', passwd='123123', db='nj2')
 cur = db.cursor()
 now = time.strftime('%Y%m%d', time.localtime())
 #pay =0
@@ -15,9 +16,9 @@ now = time.strftime('%Y%m%d', time.localtime())
 def initial_screen():
     print("\t\tST-POS시스템을 사용해주셔서 감사합니다.")
     print("--------------------------------------------------------")
-    print("\t\t 메뉴 \t\t 계산 \t\t 매출 \t\t 고객 ")
+    print("\t\t 메뉴 \t\t 계산 \t\t 매출 \t\t 고객")
     print("--------------------------------------------------------")
-
+    print("프롬프트에 'help'를 치시면 사용 가능한 명령어를 확인하실 수 있습니다.")
 def instruct_input():
     instruction = input(">> ")
     return instruction
@@ -25,11 +26,10 @@ def instruct_input():
 
 def instruct_help():
     print("\n프롬프트에 다음 설명하는 것을 입력하세요.")
-    print("메뉴       현재 매장에서 판매하는 메뉴 확인")
-    print("계산       계산 시스템 활성화")
-    print("매출       데이터베이스에 있는 매출을 출력")
-    print("고객       매장에 등록되어 있는 고객 정보 확인")
-    print("종료       프로그램 종료")
+    print("menu       현재 매장에서 판매하는 메뉴 확인")
+    print("casher     계산 시스템 활성화")
+    print("sales      데이터베이스에 있는 매출을 출력")
+    print("exit       프로그램 종료")
 
 def instruct_allmenu():
     cur.execute("select * from menu")
