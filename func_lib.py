@@ -17,7 +17,7 @@ now = time.strftime('%Y%m%d', time.localtime())
 def initial_screen():
     print("\t\tST-POS시스템을 사용해주셔서 감사합니다.")
     print("--------------------------------------------------------")
-    print("\t\t 메뉴 \t\t 계산 \t\t 매출 \t\t 고객")
+    print("\t\t 메뉴 \t\t 계산 \t\t 매출 \t\t 재고")
     print("--------------------------------------------------------")
     print("프롬프트에 'help'를 치시면 사용 가능한 명령어를 확인하실 수 있습니다.")
 def instruct_input():
