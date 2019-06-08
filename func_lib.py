@@ -188,7 +188,7 @@ def instruct_table():
     else:
         print("빈테이블")
 
-    stop = input("계산하시겠습니까?y/n(메뉴 돌아가기는 h)")
+    stop = input("계산하시겠습니까?y/n(메뉴 돌아가기는 n)")
 
     if stop == 'y':
         tablenum = int(input("\n\n몇번 테이블을 계산하시겠습니까?(1~5번)"))
@@ -213,14 +213,19 @@ def instruct_table():
         else:
             print("빈테이블 입니다!")
     if stop =='n':
-        instruct_table()
-    if stop =='h':
         initial_screen()
 
 
 def instruct_sales():
-    print("일별 매출 : daily | 월별 매출 : monthly | 메뉴별 매출 : menu")
-    print("날씨별 매출 : weather | 주문당 매출 : sales | 미세먼지 상황별 매출 : dust\n")
+    menutable = PrettyTable()
+    menutable.field_names=["조회","명령어"]
+    menutable.add_row(["날짜별 매출","daily"])
+    menutable.add_row(["월별 매출","monthly"])
+    menutable.add_row(["메뉴별 매출","menu"])
+    menutable.add_row(["날씨별 매출","weather"])
+    menutable.add_row(["주문건당 매출","sales"])
+    menutable.add_row(["미세먼지 농도별 매출","dust"])
+    print(menutable)
     clfy = input("확인하고 싶은 매출 카테고리 입력 : ")
 
     if clfy == "sales":
